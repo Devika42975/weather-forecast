@@ -1,80 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+const getFiveDayForecast = (list) => {
+  const dailyData = [];
+  const seenDates = new Set();
+
+  for (let i = 0; i < list.length; i++) {
+    const forecast = list[i];
+    const [date, time] = forecast.dt_txt.split(" ");
+
+    if (time === "12:00:00" && !seenDates.has(date)) {
+      seenDates.add(date);
+      dailyData.push(forecast);
+    }
+
+    if (dailyData.length === 5) break;
+  }
+
+  return dailyData;
+};
+
+const getDayName = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", { weekday: "long" });
+};
+
 function App() {
   const [city, setCity] = useState('Hyderabad');
   const [weatherData, setWeatherData] = useState(null);
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const API_KEY = "d7aa93a06672a9120716d142a5026396";
 
   useEffect(() => {
     if (!city) return;
-
-    const fetchWeather = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`
-        );
-        const data = await response.json();
-
-        if (data.cod !== "200") {
-          setError(data.message);
-          setWeatherData(null);
-        } else {
-          setError(null);
+    setLoading(true);
+    setError('');
+    fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.cod === "200") {
           setWeatherData(data);
+        } else {
+          setError("City not found");
         }
-      } catch (err) {
-        setError("Failed to fetch weather data.");
-        setWeatherData(null);
-      } finally {
         setLoading(false);
-      }
-    };
-
-    fetchWeather();
+      })
+      .catch(() => {
+        setError("Failed to fetch data");
+        setLoading(false);
+      });
   }, [city]);
-
-  const getFiveDayForecast = (list) => {
-    const dailyData = [];
-    const seenDates = new Set();
-
-    for (let i = 0; i < list.length; i++) {
-      const forecast = list[i];
-      const [date, time] = forecast.dt_txt.split(" ");
-
-      if (time === "12:00:00" && !seenDates.has(date)) {
-        seenDates.add(date);
-        dailyData.push(forecast);
-      }
-
-      if (dailyData.length === 5) break;
-    }
-
-    return dailyData;
-  };
-
-  const getDayName = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { weekday: "long" });
-  };
 
   return (
     <div className="app">
       <h1>Weather Forecast App</h1>
-      <input
-        value={city}
-        onChange={e => setCity(e.target.value)}
-        placeholder="Enter city"
-      />
+      <input value={city} onChange={e => setCity(e.target.value)} placeholder="Enter city" />
 
-      {error && <p className="error">{error}</p>}
-      {loading && <div className="spinner"></div>}
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {weatherData && !loading ? (
+      {weatherData && !loading && !error && (
         <div className="forecast">
           <h2>{weatherData.city.name}</h2>
           {getFiveDayForecast(weatherData.list).map((item, index) => (
@@ -89,7 +76,7 @@ function App() {
             </div>
           ))}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
