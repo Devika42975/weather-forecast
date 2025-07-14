@@ -1,10 +1,25 @@
+/* App.css */
 .app {
   text-align: center;
   font-family: Arial, sans-serif;
   padding: 20px;
+  transition: background 0.3s, color 0.3s;
 }
 
-input {
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.theme-toggle button {
+  padding: 8px 15px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.search input {
   padding: 10px;
   font-size: 16px;
   margin-bottom: 20px;
@@ -14,7 +29,26 @@ input {
   border-radius: 5px;
 }
 
+.search button {
+  padding: 10px 15px;
+  margin-left: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background-color: #2196f3;
+  color: white;
+  cursor: pointer;
+}
+
+.search button:hover {
+  background-color: #0b7dda;
+}
+
 .forecast {
+  margin-top: 20px;
+}
+
+.card-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -24,7 +58,6 @@ input {
 .card {
   background-color: #e0f7fa;
   padding: 15px;
-  margin: 10px;
   border-radius: 8px;
   width: 200px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -35,7 +68,6 @@ input {
   height: 80px;
 }
 
-/* Spinner */
 .spinner {
   border: 6px solid #f3f3f3;
   border-top: 6px solid #3498db;
@@ -51,9 +83,24 @@ input {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .card {
-    width: 90%;
-  }
+.error {
+  color: red;
+  font-weight: bold;
+}
+
+/* Dark Mode */
+.app.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.app.dark .card {
+  background-color: #333;
+  color: #fff;
+}
+
+.app.dark .search input {
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #444;
 }
