@@ -60,17 +60,26 @@ function App() {
     });
   };
 
-  const getFiveDayForecast = (list) => {
-    const dailyMap = new Map();
-    list.forEach(item => {
-      const date = item.dt_txt.split(' ')[0];
-      const time = item.dt_txt.split(' ')[1];
-      if (time === "12:00:00" && !dailyMap.has(date)) {
-        dailyMap.set(date, item);
-      }
-    });
-    return Array.from(dailyMap.values()).slice(0, 5);
-  };
+ const getFiveDayForecast = (list) => {
+  // Log all forecast entries
+  console.log("🔍 Raw forecast timestamps:", list.map(item => item.dt_txt));
+
+  const dailyMap = new Map();
+
+  list.forEach(item => {
+    const date = item.dt_txt.split(' ')[0];
+    const time = item.dt_txt.split(' ')[1];
+    if (time === "12:00:00" && !dailyMap.has(date)) {
+      dailyMap.set(date, item);
+    }
+  });
+
+  // Log selected entries
+  console.log("✅ Selected 5-day entries:", Array.from(dailyMap.values()).map(item => item.dt_txt));
+
+  return Array.from(dailyMap.values()).slice(0, 5);
+};
+
 
   useEffect(() => {
     fetchWeather();
@@ -114,20 +123,24 @@ function App() {
           <h2>{weatherData.city.name}, {weatherData.city.country}</h2>
           <div className="card-container">
             {getFiveDayForecast(weatherData.list).map((item, index) => (
-              <div key={index} className="card">
-                <p>{new Date(item.dt_txt).toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric'
-                })}</p>
-                <img
-                  src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
-                  alt={item.weather[0].description}
-                />
-                <p>{item.main.temp}°C</p>
-                <p>{item.weather[0].description}</p>
-              </div>
-            ))}
+  <div key={index} className="card">
+    {console.log("📅 Rendering card for:", item.dt_txt)}  {/* 👈 ADD HERE */}
+    <p>
+      {new Date(item.dt_txt).toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      })}
+    </p>
+    <img
+      src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
+      alt={item.weather[0].description}
+    />
+    <p>{item.main.temp}°C</p>
+    <p>{item.weather[0].description}</p>
+  </div>
+))}
+
           </div>
         </div>
       ) : null}
